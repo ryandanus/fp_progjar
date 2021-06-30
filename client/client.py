@@ -2,6 +2,7 @@ import os
 import socket
 import sys
 import threading
+import testcard
 
 def read_msg(sock_cli):
     while True:

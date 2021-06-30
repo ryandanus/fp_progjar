@@ -1,5 +1,6 @@
 import socket
 import threading
+import testcard
 
 def read_msg(clients, sock_cli, addr_cli, username_cli):
     # clients = daftar client
@@ -94,6 +95,12 @@ def read_msg(clients, sock_cli, addr_cli, username_cli):
 
             dest_sock_cli.send(str(header).encode("utf-8"))
             dest_sock_cli.send(filedata)
+        # elif command == "createroom":
+
+        # elif command == "joinroom":
+
+        # elif command == "listroom":
+
         else:
             try:
                 dest_sock_cli = clients[command][0]
@@ -112,12 +119,40 @@ def read_msg(clients, sock_cli, addr_cli, username_cli):
 
 # fungsi broadcast
 def send_broadcast(clients, data, sender_addr_cli):
-    for sock_cli, addr_cli, username_cli, friends_cli in clients.values():
+    for sock_cli, addr_cli, username_cli, friends_cli, credits_cli in clients.values():
         if not (addr_cli[0] == sender_addr_cli[0] and addr_cli[1] == sender_addr_cli[1]):
             send_msg(sock_cli,data)
 
 def send_msg(sock_cli, data):
     sock_cli.send(bytes(data, "utf-8"))
+
+class Card(object):
+    def __init__(self, value, suit):
+        self.value = value
+        self.suit = suit
+    def __repr__(self):
+        return str(self.value) + "of" + self.suit
+
+class Deck(list):
+    def __init__(self):
+        suits = ["Hearts", "Spades", "Diamonds", "Clubs"]
+        values = {"Two" : 2,
+                  "Three" : 3,
+                  "Four" : 4,
+                  "Five" : 5,
+                  "Six" : 6,
+                  "Seven" : 7,
+                  "Eight" : 8,
+                  "Nine" : 9,
+                  "Ten" : 10,
+                  "Jack" : 11,
+                  "Queen" : 12,
+                  "King" : 13,
+                  "Ace" : 14,}
+
+        for name in values:
+            for suit in suits:
+                self.append(Card(name, values[name], suit))
 
 # buat object socket server
 sock_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -145,5 +180,7 @@ while True:
 
     friends_cli = set()
 
+    credits_cli = 10000;
+
     # simpan info ttg client ke dictionary
-    clients[username_cli] = (sock_cli, addr_cli, thread_cli, friends_cli)
+    clients[username_cli] = (sock_cli, addr_cli, thread_cli, friends_cli, credits_cli)

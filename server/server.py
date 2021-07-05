@@ -1,6 +1,6 @@
 import socket
 import threading
-import testcard
+
 
 def read_msg(clients, sock_cli, addr_cli, username_cli):
     # clients = daftar client
@@ -13,6 +13,8 @@ def read_msg(clients, sock_cli, addr_cli, username_cli):
         if len(data) == 0:
             break
 
+        rooms = dict()
+
         # parsing pesan
         command, msg = data.split("|") # command dan isi pesan
 
@@ -21,7 +23,6 @@ def read_msg(clients, sock_cli, addr_cli, username_cli):
         # teruskan pesan ke semua client
         if command == "bcast":
             send_broadcast(clients, announce, addr_cli)
-
         # Add friend
         elif command == "addfriend":
             # requester = username_cli/sock_cli, target = msg/dest_sock_cli
@@ -95,11 +96,18 @@ def read_msg(clients, sock_cli, addr_cli, username_cli):
 
             dest_sock_cli.send(str(header).encode("utf-8"))
             dest_sock_cli.send(filedata)
-        # elif command == "createroom":
+        elif command == "createroom":
+            # newroom = gameroom(msg)
+            roomname = msg
+            rooms[msg] = (roomname)
+            send_msg(sock_cli, "Room {} Dibuat".format(msg))
 
-        # elif command == "joinroom":
+        elif command == "joinroom":
+            pass
 
-        # elif command == "listroom":
+        elif command == "listroom":
+            print(rooms)
+            send_msg(sock_cli, "Daftar Room: " + str(rooms))
 
         else:
             try:
@@ -126,39 +134,21 @@ def send_broadcast(clients, data, sender_addr_cli):
 def send_msg(sock_cli, data):
     sock_cli.send(bytes(data, "utf-8"))
 
-class Card(object):
-    def __init__(self, value, suit):
-        self.value = value
-        self.suit = suit
+class gameroom(object):
+    def __init__(self, roomname):
+        self.name = roomname
+    def join(self, clients):
+        pass
     def __repr__(self):
-        return str(self.value) + "of" + self.suit
+        while True:
+            pass
 
-class Deck(list):
-    def __init__(self):
-        suits = ["Hearts", "Spades", "Diamonds", "Clubs"]
-        values = {"Two" : 2,
-                  "Three" : 3,
-                  "Four" : 4,
-                  "Five" : 5,
-                  "Six" : 6,
-                  "Seven" : 7,
-                  "Eight" : 8,
-                  "Nine" : 9,
-                  "Ten" : 10,
-                  "Jack" : 11,
-                  "Queen" : 12,
-                  "King" : 13,
-                  "Ace" : 14,}
-
-        for name in values:
-            for suit in suits:
-                self.append(Card(name, values[name], suit))
 
 # buat object socket server
 sock_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # binding object socket ke alamat IP dan port
-sock_server.bind(("127.0.0.1", 8000))
+sock_server.bind(("127.0.0.1", 6666))
 
 # listen
 sock_server.listen(5)
@@ -180,7 +170,7 @@ while True:
 
     friends_cli = set()
 
-    credits_cli = 10000;
+    credits_cli = 10000
 
     # simpan info ttg client ke dictionary
     clients[username_cli] = (sock_cli, addr_cli, thread_cli, friends_cli, credits_cli)

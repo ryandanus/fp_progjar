@@ -2,7 +2,7 @@ import os
 import socket
 import sys
 import threading
-import testcard
+
 
 def read_msg(sock_cli):
     while True:
@@ -39,7 +39,7 @@ if not os.path.exists(username):
 sock_cli = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # connect
-sock_cli.connect(("127.0.0.1", 8000))
+sock_cli.connect(("127.0.0.1", 6666))
 
 # kirim username
 sock_cli.send(bytes(username, "utf-8"))
